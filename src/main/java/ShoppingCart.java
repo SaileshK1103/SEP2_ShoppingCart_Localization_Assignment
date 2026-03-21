@@ -30,7 +30,7 @@ public class ShoppingCart {
         ResourceBundle bundle = ResourceBundle.getBundle("MessagesBundle", locale);
 
         // Prompt for number of items
-        System.out.println(bundle.getString("message.items") + " ");
+        System.out.println(bundle.getString("msg.items") + " ");
         int numItems = scanner.nextInt();
 
         double cartTotal = 0;
@@ -48,12 +48,13 @@ public class ShoppingCart {
             // Calculate item total using the logic method
             double itemTotal = cart.calculateItemTotal(price, quantity);
             cartTotal += itemTotal;
-
-            // Display final total
-            System.out.println("\n-------------------------");
-            System.out.println(bundle.getString("msg.total") + " " + String.format("%.2f\", cartTotal"));
-
-            scanner.close();
         }
+        // Display final total
+        System.out.println("\n-------------------------");
+        String formattedTotal = String.format("%.2f", cartTotal);
+        System.out.println(bundle.getString("msg.total") + " " + formattedTotal);
+        System.out.println("---------------------------");
+
+        scanner.close();
     }
 }
