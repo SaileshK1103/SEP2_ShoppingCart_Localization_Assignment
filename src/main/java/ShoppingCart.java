@@ -39,7 +39,7 @@ public class ShoppingCart {
 
         // Loop through items
         for (int i=1; i <= numItems; i++) {
-            System.out.println("\n--- Item #" + i + " ---");
+            System.out.println("\n--- CartItem #" + i + " ---");
 
             System.out.print(bundle.getString("msg.price") + " ");
             double price = scanner.nextDouble();
