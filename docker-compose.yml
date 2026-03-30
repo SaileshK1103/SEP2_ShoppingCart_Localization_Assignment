@@ -4,10 +4,13 @@ services:
   app:
     image: saileshk1103/sep2_shoppingcart_localization_assignment:latest
     container_name: shopping-cart-app
-    ports:
-      - "9000:8080"
+    # Bridge to your Mac's X11 socket
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
     environment:
+      - DISPLAY=host.docker.internal:0
       - LANG=en_US.UTF-8
       - LC_ALL=en_US.UTF-8
-      - DISPLAY=host.docker.internal:0.0
+      # Force software rendering for M1/XQuartz compatibility
+      - JAVA_TOOL_OPTIONS=-Dprism.order=sw -Djava.awt.headless=false
     restart: on-failure

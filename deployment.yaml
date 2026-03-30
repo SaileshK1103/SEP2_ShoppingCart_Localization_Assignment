@@ -16,13 +16,14 @@ spec:
         - name: shopping-cart
           image: saileshk1103/sep2_shoppingcart_localization_assignment:latest
           imagePullPolicy: Always
-          ports:
-            - containerPort: 8080
           env:
+            - name: DISPLAY
+              value: "host.docker.internal:0"
             - name: LANG
               value: "en_US.UTF-8"
             - name: JAVA_TOOL_OPTIONS
-              value: "-Djava.awt.headless=true"
+              # CRITICAL: headless=false so it tries to open the window
+              value: "-Djava.awt.headless=false -Dprism.order=sw"
 ---
 apiVersion: v1
 kind: Service

@@ -20,15 +20,9 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                sh 'mvn clean install'
-            }
-        }
-
         stage('Test & Coverage') {
             steps {
-                sh 'mvn jacoco:report'
+                sh 'mvn clean test jacoco:report'
             }
             post {
                 always {
