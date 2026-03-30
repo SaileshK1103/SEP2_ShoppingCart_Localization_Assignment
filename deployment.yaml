@@ -23,7 +23,7 @@ spec:
               value: "en_US.UTF-8"
             - name: JAVA_TOOL_OPTIONS
               # CRITICAL: headless=false so it tries to open the window
-              value: "-Djava.awt.headless=false -Dprism.order=sw"
+              value: "-Djava.awt.headless=false -Dprism.order=sw -Djavafx.fontdir=/usr/share/fonts/opentype/noto"
 ---
 apiVersion: v1
 kind: Service
