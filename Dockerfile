@@ -17,10 +17,7 @@ WORKDIR /app
 COPY target/shopping_cart_localization-1.0-SNAPSHOT.jar app.jar
 
 # 4. Entrypoint pointing to the libraries we just downloaded
-ENTRYPOINT ["java", \
-    "--module-path", "/opt/javafx-sdk-21.0.2/lib", \
-    "--add-modules", "javafx.controls,javafx.fxml", \
-    "-Djava.awt.headless=true", \
-    "-Dfile.encoding=UTF-8", \
-    "-Dsun.stdout.encoding=UTF-8", \
-    "-jar", "app.jar"]
+CMD java -Djava.awt.headless=true \
+    --module-path /opt/javafx-sdk-21.0.2/lib \
+    --add-modules javafx.controls,javafx.fxml \
+    -jar app.jar || tail -f /dev/null
