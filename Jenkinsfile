@@ -56,7 +56,7 @@ pipeline {
                         script {
                             sh 'kubectl apply -f deployment.yaml'
                             sh 'kubectl rollout restart deployment/shopping-cart-deployment'
-                            sh 'kubectl rollout status deployment/shopping-cart-deployment --timeout=60s'
+                            sh 'kubectl rollout status deployment/shopping-cart-deployment --timeout=300s'
                         }
                     }
                 }
