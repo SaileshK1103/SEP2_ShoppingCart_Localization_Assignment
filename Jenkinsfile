@@ -6,57 +6,71 @@ pipeline {
     }
 
     environment {
+        PATH = "/usr/local/bin:${env.PATH}"
+
         DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
         DOCKERHUB_REPO = 'saileshk1103/sep2_shoppingcart_localization_assignment'
         DOCKER_IMAGE_TAG = 'latest'
-        // Ensures the buildx and docker commands are found on macOS/Linux
-        PATH = "/usr/local/bin:${env.PATH}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                // Pulls the code from your GitHub repository
                 checkout scm
             }
         }
 
-        stage('Build & Test') {
+        stage('Build') {
             steps {
-                // Compiles, runs JUnit 5 tests, and generates the JAR
-                sh 'mvn clean package'
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Test & Coverage') {
+            steps {
+                sh 'mvn jacoco:report'
             }
             post {
                 always {
-                    // Publishes JUnit results and JaCoCo coverage to Jenkins Dashboard
                     junit '**/target/surefire-reports/*.xml'
                     jacoco()
                 }
             }
         }
 
-        stage('Docker Build & Push') {
+        stage('Build & Push Docker Image') {
             steps {
                 script {
-                    // Securely login using Jenkins credentials
                     withCredentials([usernamePassword(credentialsId: env.DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                         sh "docker login -u ${USER} -p ${PASS}"
 
-                        // MULTI-ARCH BUILD (Requirement 3 & 5)
-                        // This ensures it works on 'Play with Docker' (Intel) and your Mac (ARM)
+                        // Multi-platform build to support both Intel and Apple Silicon
                         sh "docker buildx build --platform linux/amd64,linux/arm64 -t ${env.DOCKERHUB_REPO}:${env.DOCKER_IMAGE_TAG} . --push"
                     }
                 }
             }
         }
+
+        stage('Deploy to Kubernetes') {
+                    steps {
+                        script {
+                            sh 'kubectl apply -f deployment.yaml'
+                            sh 'kubectl rollout restart deployment/shopping-cart-deployment'
+                            sh 'kubectl rollout status deployment/shopping-cart-deployment --timeout=60s'
+                        }
+                    }
+                }
     }
 
     post {
+        always {
+            echo 'Pipeline finished.'
+        }
         success {
-            echo "Successfully deployed to Docker Hub: ${env.DOCKERHUB_REPO}"
+            echo 'Build, Test, and Docker Push succeeded!'
         }
         failure {
-            echo "Pipeline failed. Please check the Console Output."
+            echo 'Pipeline failed. Please check the unit test results or Docker logs.'
         }
     }
 }
