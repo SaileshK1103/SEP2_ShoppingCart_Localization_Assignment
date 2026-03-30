@@ -14,6 +14,7 @@ RUN apt-get update && \
 
 WORKDIR /app
 
+ARG CACHEBUST=1
 # 4. Copy the JAR built by your Jenkins 'Build' stage
 COPY target/ShoppingCartApp.jar app.jar
 
