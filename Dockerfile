@@ -6,7 +6,10 @@ RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime
 FROM eclipse-temurin:21-jre
-RUN apt-get update && apt-get install -y libgtk-3-0 libgbm1 libx11-6 && apt-get clean
+RUN apt-get update && apt-get install -y \
+    libgtk-3-0 libgbm1 libx11-6 \
+    fonts-noto-cjk \
+    && apt-get clean
 
 WORKDIR /app
 
