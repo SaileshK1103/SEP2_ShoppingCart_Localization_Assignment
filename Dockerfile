@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y libgtk-3-0 libgbm1 libx11-6 && apt-get 
 WORKDIR /app
 
 # Copy the SHADED jar from the build stage
-COPY --from=build /app/target/shopping_cart-shaded.jar app.jar
+COPY --from=build /app/target/shopping_cart_localization-1.0-SNAPSHOT-shaded.jar app.jar
 
 # Automatic Start Command
 # -Dprism.order=sw: Forces software rendering for XQuartz/M1 compatibility
