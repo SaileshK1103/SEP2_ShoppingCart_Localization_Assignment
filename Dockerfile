@@ -18,4 +18,4 @@ WORKDIR /app
 COPY target/ShoppingCartApp.jar app.jar
 
 # 5. Entrypoint with your UTF-8 flags for perfect localization
-ENTRYPOINT ["java", "-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-Djava.awt.headless=true", "-Dfile.encoding=UTF-8", "-Dsun.stdout.encoding=UTF-8", "-jar", "app.jar"]
