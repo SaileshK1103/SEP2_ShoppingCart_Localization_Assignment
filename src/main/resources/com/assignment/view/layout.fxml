@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="15.0" alignment="TOP_LEFT" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.assignment.controller.ShoppingCartController">
+    <padding>
+        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+    </padding>
+
+    <Label text="Select the language:" />
+    <ComboBox fx:id="languageSelector" onAction="#onLanguageChange" prefWidth="200.0" />
+
+    <Separator />
+
+    <Label fx:id="labelPrice" text="Price" />
+    <TextField fx:id="inputPrice" promptText="0.00" />
+
+    <Label fx:id="labelQuantity" text="Quantity" />
+    <TextField fx:id="inputQuantity" promptText="0" />
+
+    <Button fx:id="btnCalculate" onAction="#handleCalculate" prefWidth="200.0" />
+
+    <Separator />
+
+    <HBox spacing="10.0" alignment="CENTER_LEFT">
+        <Label fx:id="labelTotalText" text="Total:">
+            <font><Font name="System Bold" size="14.0" /></font>
+        </Label>
+        <Label fx:id="labelTotalAmount" text="0.00">
+            <font><Font name="System Bold" size="14.0" /></font>
+        </Label>
+    </HBox>
+</VBox>

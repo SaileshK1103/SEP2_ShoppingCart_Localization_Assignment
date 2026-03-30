@@ -1,4 +1,4 @@
-package com.assignment.ui;
+package com.assignment.controller;
 
 import com.assignment.logic.CartService;
 import javafx.fxml.FXML;
