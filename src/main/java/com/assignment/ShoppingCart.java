@@ -1,5 +1,6 @@
 package com.assignment;
 
+import com.assignment.data.DatabaseConnection;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
