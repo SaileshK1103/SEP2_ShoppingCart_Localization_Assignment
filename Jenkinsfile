@@ -60,9 +60,6 @@ pipeline {
 
                             // Force Kubernetes to pull the new image you just pushed
                             sh 'kubectl rollout restart deployment shopping-cart-deployment'
-
-                            // Wait for the rollout to finish so Jenkins knows it succeeded
-                            sh 'kubectl rollout status deployment shopping-cart-deployment'
                         }
             }
         }
