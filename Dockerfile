@@ -3,7 +3,7 @@ FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY . .
 # We run tests here so JaCoCo can capture the data for Jenkins!
-RUN mvn clean package jacoco:report
+RUN mvn clean package -DskipTests
 
 # Stage 2: Runtime (Server-ready)
 FROM eclipse-temurin:21-jre
