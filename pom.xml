@@ -12,6 +12,7 @@
         <maven.compiler.release>21</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <javafx.version>21</javafx.version>
+        <argLine></argLine>
     </properties>
 
     <dependencies>
@@ -54,10 +55,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
                 <configuration>
-                    <argLine>
-                        --add-exports javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
-                        --add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
-                    </argLine>
+                    <useModulePath>false</useModulePath> <argLine>
+                    ${argLine} --add-exports javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
+                    --add-opens javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
+                </argLine>
                 </configuration>
             </plugin>
 
