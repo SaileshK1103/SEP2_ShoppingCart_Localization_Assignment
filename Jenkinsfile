@@ -56,8 +56,7 @@ pipeline {
             steps {
                 script {
                             // Apply the deployment and service files directly
-                            sh 'kubectl apply -f kubernetes/deployment.yaml'
-                            sh 'kubectl apply -f kubernetes/service.yaml'
+                            sh 'kubectl apply -f deployment.yaml'
 
                             // Force Kubernetes to pull the new image you just pushed
                             sh 'kubectl rollout restart deployment shopping-cart-deployment'
