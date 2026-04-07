@@ -54,8 +54,17 @@ pipeline {
 
         stage('Deploy to Kubernetes') {
             steps {
-                sh "envsubst < deployment.yaml | kubectl apply -f -"
-                sh "kubectl rollout restart deployment/shopping-cart-deployment"
+                script {
+                            // Apply the deployment and service files directly
+                            sh 'kubectl apply -f kubernetes/deployment.yaml'
+                            sh 'kubectl apply -f kubernetes/service.yaml'
+
+                            // Force Kubernetes to pull the new image you just pushed
+                            sh 'kubectl rollout restart deployment shopping-cart-deployment'
+
+                            // Wait for the rollout to finish so Jenkins knows it succeeded
+                            sh 'kubectl rollout status deployment shopping-cart-deployment'
+                        }
             }
         }
     }
