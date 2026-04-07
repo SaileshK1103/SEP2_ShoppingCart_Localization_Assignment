@@ -29,7 +29,7 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                sh 'mvn clean package jacoco:report'
+                sh 'mvn clean org.jacoco:jacoco-maven-plugin:prepare-agent test org.jacoco:jacoco-maven-plugin:report'
             }
             post {
                 always {
