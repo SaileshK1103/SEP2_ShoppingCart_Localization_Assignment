@@ -4,28 +4,40 @@ services:
   db:
     image: mariadb:10.6
     container_name: shopping-cart-db
+    restart: always
     environment:
-      - MARIADB_ROOT_PASSWORD=admin
+      # Use a random root password to keep it secure and separate
+      - MARIADB_RANDOM_ROOT_PASSWORD=yes
       - MARIADB_DATABASE=shopping_cart_localization
       - MARIADB_USER=Sailesh
       - MARIADB_PASSWORD=admin
     ports:
       - "3306:3306"
-    restart: always
+    volumes:
+      # Seeds Japanese/Arabic data from your export file
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Saves database data to your project folder so it persists
+      - ./mariadb_data:/var/lib/mysql
 
   app:
     image: saileshk1103/sep2_shoppingcart_localization_assignment:latest
     container_name: shopping-cart-app
     depends_on:
       - db
+    restart: on-failure
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
     environment:
-      - DISPLAY=host.docker.internal:0
-      - DB_URL=jdbc:mysql://db:3306/shopping_cart_localization?useUnicode=true&characterEncoding=UTF-8
-      - DB_USER=Sailesh
+      # Matches the variables in your DatabaseConnection.java
+      - DB_HOST=db
+      - DB_NAME=shopping_cart_localization
+      - DB_USERNAME=Sailesh
       - DB_PASSWORD=admin
+
+      # 🌍 Localization and Display Settings
       - LANG=C.UTF-8
       - LC_ALL=C.UTF-8
+      - DISPLAY=host.docker.internal:0
+
+      # 🛠️ JavaFX and UTF-8 fixes
       - JAVA_TOOL_OPTIONS=-Dprism.order=sw -Djava.awt.headless=false -Dfile.encoding=UTF-8
-    restart: on-failure

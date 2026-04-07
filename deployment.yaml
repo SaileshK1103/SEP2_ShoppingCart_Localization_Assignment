@@ -22,12 +22,15 @@ spec:
             - name: LANG
               value: "C.UTF-8"
             - name: JAVA_TOOL_OPTIONS
-              # Added -Dfile.encoding=UTF-8 for Japanese/Arabic support
               value: "-Djava.awt.headless=false -Dprism.order=sw -Dfile.encoding=UTF-8 -Djavafx.fontdir=/usr/share/fonts/opentype/noto"
-            # Database Connection Info
+            # Database Connection Info - Mapping to your Java Env Var names
             - name: DB_URL
               value: "jdbc:mysql://db-service:3306/shopping_cart_localization?useUnicode=true&characterEncoding=UTF-8"
-            - name: DB_USER
+            - name: DB_HOST
+              value: "db-service"
+            - name: DB_NAME
+              value: "shopping_cart_localization"
+            - name: DB_USERNAME
               value: "Sailesh"
             - name: DB_PASSWORD
               value: "admin"
@@ -64,15 +67,24 @@ spec:
           image: mariadb:10.6
           env:
             - name: MARIADB_ROOT_PASSWORD
-              value: "${DB_ROOT_PASSWORD}"
+              value: "admin"
             - name: MARIADB_DATABASE
               value: "shopping_cart_localization"
             - name: MARIADB_USER
-              value: "${DB_USER}"
+              value: "Sailesh"
             - name: MARIADB_PASSWORD
-              value: "${DB_PASSWORD}"
+              value: "admin"
           ports:
             - containerPort: 3306
+          # 🚀 Mount the ConfigMap as a file inside the container
+          volumeMounts:
+            - name: init-script-volume
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        # 🚀 Tell K8s to use the ConfigMap created from your init.sql
+        - name: init-script-volume
+          configMap:
+            name: mariadb-init-config
 ---
 # --- DATABASE SERVICE ---
 apiVersion: v1

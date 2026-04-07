@@ -7,10 +7,17 @@ pipeline {
 
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
-
+        // Global environment variables
+        DB_URL = "${params.DB_URL}"
+        DB_USERNAME = "${params.DB_USERNAME}"
+        DB_PASSWORD = "${params.DB_PASSWORD}"
+        // Configuration for the build
         DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
         DOCKERHUB_REPO = 'saileshk1103/sep2_shoppingcart_localization_assignment'
         DOCKER_IMAGE_TAG = 'latest'
+        // Helper for local tests
+        DB_HOST = 'localhost'
+        DB_NAME = 'shopping_cart_localization'
     }
 
     stages {
@@ -22,7 +29,7 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                sh 'mvn clean test jacoco:report'
+                sh 'mvn clean package jacoco:report'
             }
             post {
                 always {
@@ -46,17 +53,10 @@ pipeline {
         }
 
         stage('Deploy to Kubernetes') {
-                    steps {
-                        script {
-                            // This pulls the secret from Jenkins and puts it into variables
-                            withCredentials([usernamePassword(credentialsId: 'DB_CREDENTIALS', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD'),
-                                             password(credentialsId: 'DB_ROOT_ID', variable: 'DB_ROOT_PASSWORD')]) {
-
-                                // Use 'envsubst' to replace the ${VARIABLES} in your YAML with the real ones
-                                sh "envsubst < deployment.yaml | kubectl apply -f -"
-                            }
-                        }
-                    }
+            steps {
+                sh "envsubst < deployment.yaml | kubectl apply -f -"
+                sh "kubectl rollout restart deployment/shopping-cart-deployment"
+            }
         }
     }
     post {

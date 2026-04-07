@@ -5,23 +5,25 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DatabaseConnection {
-    private static final String DB_HOST = System.getenv().getOrDefault("DB_HOST", "localhost");
-    private static final String DB_NAME = System.getenv().getOrDefault("DB_NAME", "shopping_cart_localization");
-    private static final String DB_USER = System.getenv().getOrDefault("DB_USER", "default_user");
-    private static final String DB_PASS = System.getenv().getOrDefault("DB_PASSWORD", "");
-
-    private static final String URL = "jdbc:mysql://" + DB_HOST + ":3306/" + DB_NAME + "?useUnicode=true&characterEncoding=UTF-8";
+    private static final String DB_HOST = System.getenv("DB_HOST");
+    private static final String DB_NAME = System.getenv("DB_NAME");
+    private static final String DB_USER = System.getenv("DB_USERNAME");
+    private static final String DB_PASS = System.getenv("DB_PASSWORD");
 
     public static Connection getConnection() throws SQLException {
+        // Build the URL dynamically from environment variables
+        String url = "jdbc:mysql://" +
+                (DB_HOST != null ? DB_HOST : "localhost") + ":3306/" +
+                (DB_NAME != null ? DB_NAME : "shopping_cart_localization") +
+                "?useUnicode=true&characterEncoding=UTF-8";
         try {
-            // Debug print (Safe: doesn't print the password)
-            System.out.println("🔍 Connecting to " + DB_NAME + " on " + DB_HOST + " as user: " + DB_USER);
-
-            Connection conn = DriverManager.getConnection(URL, DB_USER, DB_PASS);
+            System.out.println("🔍 Connecting to DB as user: " + DB_USER);
+            // If DB_USER or DB_PASS are null, this will throw an exception (secure)
+            Connection conn = DriverManager.getConnection(url, DB_USER, DB_PASS);
             System.out.println("✅ Connection Successful!");
             return conn;
         } catch (SQLException e) {
-            System.err.println("❌ Connection Failed! Verify your Environment Variables.");
+            System.err.println("❌ Connection Failed! Environment variables missing or incorrect.");
             throw e;
         }
     }
