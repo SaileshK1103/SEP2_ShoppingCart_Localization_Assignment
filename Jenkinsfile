@@ -48,12 +48,16 @@ pipeline {
         stage('Deploy to Kubernetes') {
                     steps {
                         script {
-                            sh 'kubectl apply -f deployment.yaml'
-                            sh 'kubectl rollout restart deployment/shopping-cart-deployment'
+                            // This pulls the secret from Jenkins and puts it into variables
+                            withCredentials([usernamePassword(credentialsId: 'DB_CREDENTIALS', usernameVariable: 'DB_USER', passwordVariable: 'DB_PASSWORD'),
+                                             password(credentialsId: 'DB_ROOT_ID', variable: 'DB_ROOT_PASSWORD')]) {
+
+                                // Use 'envsubst' to replace the ${VARIABLES} in your YAML with the real ones
+                                sh "envsubst < deployment.yaml | kubectl apply -f -"
+                            }
                         }
                     }
                 }
-    }
 
     post {
         always {

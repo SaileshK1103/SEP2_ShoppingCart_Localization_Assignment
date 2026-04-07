@@ -20,10 +20,17 @@ spec:
             - name: DISPLAY
               value: "host.docker.internal:0"
             - name: LANG
-              value: "en_US.UTF-8"
+              value: "C.UTF-8"
             - name: JAVA_TOOL_OPTIONS
-              # CRITICAL: headless=false so it tries to open the window
-              value: "-Djava.awt.headless=false -Dprism.order=sw -Djavafx.fontdir=/usr/share/fonts/opentype/noto"
+              # Added -Dfile.encoding=UTF-8 for Japanese/Arabic support
+              value: "-Djava.awt.headless=false -Dprism.order=sw -Dfile.encoding=UTF-8 -Djavafx.fontdir=/usr/share/fonts/opentype/noto"
+            # Database Connection Info
+            - name: DB_URL
+              value: "jdbc:mysql://db-service:3306/shopping_cart_localization?useUnicode=true&characterEncoding=UTF-8"
+            - name: DB_USER
+              value: "Sailesh"
+            - name: DB_PASSWORD
+              value: "admin"
 ---
 apiVersion: v1
 kind: Service
@@ -37,3 +44,44 @@ spec:
     - port: 8080
       targetPort: 8080
       nodePort: 30007
+---
+# --- DATABASE DEPLOYMENT ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mariadb-deployment
+spec:
+  selector:
+    matchLabels:
+      app: mariadb
+  template:
+    metadata:
+      labels:
+        app: mariadb
+    spec:
+      containers:
+        - name: mariadb
+          image: mariadb:10.6
+          env:
+            - name: MARIADB_ROOT_PASSWORD
+              value: "${DB_ROOT_PASSWORD}"
+            - name: MARIADB_DATABASE
+              value: "shopping_cart_localization"
+            - name: MARIADB_USER
+              value: "${DB_USER}"
+            - name: MARIADB_PASSWORD
+              value: "${DB_PASSWORD}"
+          ports:
+            - containerPort: 3306
+---
+# --- DATABASE SERVICE ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-service
+spec:
+  selector:
+    app: mariadb
+  ports:
+    - port: 3306
+      targetPort: 3306
