@@ -46,7 +46,7 @@ pipeline {
                         sh "docker login -u ${USER} -p ${PASS}"
 
                         // Multi-platform build to support both Intel and Apple Silicon
-                        sh "docker buildx build --platform linux/amd64,linux/arm64 -t ${env.DOCKERHUB_REPO}:${env.DOCKER_IMAGE_TAG} . --push"
+                        sh "docker buildx build --platform linux/arm64 -t ${env.DOCKERHUB_REPO}:${env.DOCKER_IMAGE_TAG} . --push"
                     }
                 }
             }
