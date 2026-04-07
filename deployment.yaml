@@ -15,40 +15,20 @@ spec:
       containers:
         - name: shopping-cart
           image: saileshk1103/sep2_shoppingcart_localization_assignment:latest
-          imagePullPolicy: Always
           env:
-            - name: DISPLAY
-              value: "host.docker.internal:0"
-            - name: LANG
-              value: "C.UTF-8"
-            - name: JAVA_TOOL_OPTIONS
-              value: "-Djava.awt.headless=false -Dprism.order=sw -Dfile.encoding=UTF-8 -Djavafx.fontdir=/usr/share/fonts/opentype/noto"
-            # Database Connection Info - Mapping to your Java Env Var names
             - name: DB_URL
-              value: "jdbc:mysql://db-service:3306/shopping_cart_localization?useUnicode=true&characterEncoding=UTF-8"
-            - name: DB_HOST
-              value: "db-service"
-            - name: DB_NAME
-              value: "shopping_cart_localization"
+              value: "jdbc:mariadb://db-service:3306/shopping_cart_localization"
             - name: DB_USERNAME
-              value: "Sailesh"
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: username
             - name: DB_PASSWORD
-              value: "admin"
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
 ---
-apiVersion: v1
-kind: Service
-metadata:
-  name: shopping-cart-service
-spec:
-  type: NodePort
-  selector:
-    app: shopping-cart
-  ports:
-    - port: 8080
-      targetPort: 8080
-      nodePort: 30007
----
-# --- DATABASE DEPLOYMENT ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -66,27 +46,26 @@ spec:
         - name: mariadb
           image: mariadb:10.6
           env:
-            - name: MARIADB_ROOT_PASSWORD
-              value: "admin"
             - name: MARIADB_DATABASE
               value: "shopping_cart_localization"
             - name: MARIADB_USER
-              value: "Sailesh"
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: username
             - name: MARIADB_PASSWORD
-              value: "admin"
-          ports:
-            - containerPort: 3306
-          # 🚀 Mount the ConfigMap as a file inside the container
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: password
           volumeMounts:
             - name: init-script-volume
               mountPath: /docker-entrypoint-initdb.d
       volumes:
-        # 🚀 Tell K8s to use the ConfigMap created from your init.sql
         - name: init-script-volume
           configMap:
             name: mariadb-init-config
 ---
-# --- DATABASE SERVICE ---
 apiVersion: v1
 kind: Service
 metadata:
