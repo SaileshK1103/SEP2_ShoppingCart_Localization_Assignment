@@ -1,14 +1,7 @@
-# Stage 1: Build inside the container
-FROM maven:3.9.6-eclipse-temurin-21 AS build
-WORKDIR /app
-COPY . .
-# We run tests here so JaCoCo can capture the data for Jenkins!
-RUN mvn clean package -DskipTests
-
-# Stage 2: Runtime (Server-ready)
+# SKIP STAGE 1 (MAVEN BUILD) TO SAVE TIME
 FROM eclipse-temurin:21-jre
 
-# Install X11 and GTK libraries needed for JavaFX
+# Install X11, GTK, AND Japanese Fonts (Very fast layer)
 RUN apt-get update && apt-get install -y \
     libx11-6 \
     libxext6 \
@@ -19,15 +12,17 @@ RUN apt-get update && apt-get install -y \
     libgl1 \
     libglu1-mesa \
     libglib2.0-0 \
+    fonts-ipafont-gothic \
     && rm -rf /var/lib/apt/lists/*
-# Keep UTF-8 for the Database strings (Essential)
+
+# Keep UTF-8
 ENV LANG=C.UTF-8
 ENV LC_ALL=C.UTF-8
 
 WORKDIR /app
 
-# Copy the SHADED jar from the build stage
-COPY --from=build /app/target/shopping_cart_localization-1.0-SNAPSHOT-shaded.jar app.jar
+# COPY the JAR directly from your local folder (Since it's already built)
+COPY target/shopping_cart_localization-1.0-SNAPSHOT-shaded.jar app.jar
 
-# Run in headless mode for the Pipeline
+# Run the app
 CMD ["java", "-Dfile.encoding=UTF-8", "-Djava.awt.headless=false", "-jar", "app.jar"]
