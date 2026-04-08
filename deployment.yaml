@@ -18,7 +18,7 @@ spec:
           image: saileshk1103/sep2_shoppingcart_localization_assignment:latest
           env:
             - name: DB_URL
-              value: "jdbc:mariadb://db-service:3306/shopping_cart_localization"
+              value: "jdbc:mysql://10.102.129.160:3306/shopping_cart_localization?connectTimeout=10000"
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -29,9 +29,8 @@ spec:
                 secretKeyRef:
                   name: db-credentials
                   key: password
-            # --- ADD THIS LINE BELOW ---
             - name: DISPLAY
-              value: "host.docker.internal:0"
+              value: "192.168.0.103:0"
 ---
 apiVersion: apps/v1
 kind: Deployment
