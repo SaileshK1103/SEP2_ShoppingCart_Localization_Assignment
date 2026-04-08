@@ -55,12 +55,12 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 script {
-                            // Apply the deployment and service files directly
-                            sh 'kubectl apply -f deployment.yaml'
+                    // Apply the deployment and service files directly
+                    sh 'kubectl apply -f deployment.yaml'
 
-                            // Force Kubernetes to pull the new image you just pushed
-                            sh 'kubectl rollout restart deployment shopping-cart-deployment'
-                        }
+                    // Force Kubernetes to pull the new image you just pushed
+                    sh 'kubectl rollout restart deployment shopping-cart-deployment'
+                }
             }
         }
     }
