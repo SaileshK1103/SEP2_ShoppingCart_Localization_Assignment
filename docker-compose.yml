@@ -24,6 +24,7 @@ services:
       - DB_URL=jdbc:mariadb://db:3306/${DB_NAME}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
-      - DISPLAY=host.docker.internal:0
+      - DISPLAY=docker.for.mac.host.internal:0
+    privileged: true
     ports:
       - "8080:8080"
