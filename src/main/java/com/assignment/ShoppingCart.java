@@ -1,6 +1,4 @@
 package com.assignment;
-
-import com.assignment.data.DatabaseConnection;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,8 +11,7 @@ public class ShoppingCart extends Application {
         // Load the FXML from the resources folder
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/assignment/view/layout.fxml"));
         Parent root = loader.load();
-
-        // Requirement: Your name in the title
+        
         primaryStage.setTitle("SAILESH KARKI / Shopping Cart App");
 
         Scene scene = new Scene(root, 400, 500);

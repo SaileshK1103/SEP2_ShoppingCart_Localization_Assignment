@@ -8,103 +8,68 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
-
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 public class ShoppingCartController {
     @FXML private VBox rootContainer;
     @FXML private ComboBox<String> languageSelector;
-    @FXML private TextField inputPrice, inputQuantity;
-    @FXML private Label labelPrice, labelQuantity, labelTotalText, labelTotalAmount;
 
+    // SonarQube Fix: Every FXML field on its own line
+    @FXML private TextField inputPrice;
+    @FXML private TextField inputQuantity;
+    @FXML private Label labelPrice;
+    @FXML private Label labelQuantity;
+    @FXML private Label labelTotalText;
+    @FXML private Label labelTotalAmount;
     @FXML private Button btnCalculate;
 
     private final CartService cartService = new CartService();
-
     private final DatabaseService dbService = new DatabaseService();
-    private Map<String, String> dbLabels;
-    private ResourceBundle bundle;
 
     @FXML
     public void initialize() {
         languageSelector.getItems().addAll("English", "Finnish", "Swedish", "Japanese", "Arabic");
         languageSelector.getSelectionModel().selectFirst();
-        updateLanguage("en", "US"); // Default
+        updateLanguage("en");
     }
 
     @FXML
     private void onLanguageChange() {
         String selected = languageSelector.getValue();
-        switch (selected) {
-            case "Finnish" -> updateLanguage("fi", "FI");
-            case "Swedish" -> updateLanguage("sv", "SE");
-            case "Japanese" -> updateLanguage("ja", "JP");
-            case "Arabic" -> updateLanguage("ar", "AR");
-            default -> updateLanguage("en", "US");
-        }
+        // Use the service to map the language (Better for testing!)
+        String langCode = cartService.mapLanguageToCode(selected);
+        updateLanguage(langCode);
     }
 
-    private void updateLanguage(String lang, String country) {
-       // update the ui labels using resource bundle properties
-        /*Locale locale = new Locale(lang, country);
-        bundle = ResourceBundle.getBundle("MessagesBundle", locale);
+    private void updateLanguage(String lang) {
+        Map<String, String> labels = dbService.getLabels(lang);
 
-        // Requirement 2: Dynamic UI updates
-        labelPrice.setText(bundle.getString("msg.price"));
-        labelQuantity.setText(bundle.getString("msg.quantity"));
-        labelTotalText.setText(bundle.getString("msg.total"));
-        btnCalculate.setText(bundle.getString("msg.calculate"));*/
+        rootContainer.setNodeOrientation(lang.equalsIgnoreCase("ar")
+                ? javafx.geometry.NodeOrientation.RIGHT_TO_LEFT
+                : javafx.geometry.NodeOrientation.LEFT_TO_RIGHT);
 
-        // update ui labels using database localization
-        // Fetch labels from the Database instead of ResourceBundle
-        Map<String, String> dbLabels = dbService.getLabels(lang);
-
-        // --- RTL LOGIC ---
-        // If language is Arabic, flip the screen. Otherwise, keep it standard.
-        if (lang.equalsIgnoreCase("ar")) {
-            rootContainer.setNodeOrientation(javafx.geometry.NodeOrientation.RIGHT_TO_LEFT);
-        } else {
-            rootContainer.setNodeOrientation(javafx.geometry.NodeOrientation.LEFT_TO_RIGHT);
-        }
-
-        labelPrice.setText(dbLabels.getOrDefault("msg.price", "Price"));
-        labelQuantity.setText(dbLabels.getOrDefault("msg.quantity", "Quantity"));
-        labelTotalText.setText(dbLabels.getOrDefault("msg.total", "Total"));
-        btnCalculate.setText(dbLabels.getOrDefault("msg.calculate", "Calculate"));
+        labelPrice.setText(labels.getOrDefault("msg.price", "Price"));
+        labelQuantity.setText(labels.getOrDefault("msg.quantity", "Quantity"));
+        labelTotalText.setText(labels.getOrDefault("msg.total", "Total"));
+        btnCalculate.setText(labels.getOrDefault("msg.calculate", "Calculate"));
     }
 
     @FXML
     private void handleCalculate() {
-        // Resource bundle method: week2
-        /*try {
-            double price = Double.parseDouble(inputPrice.getText());
-            int quantity = Integer.parseInt(inputQuantity.getText());
+        // We call the service to handle the logic and error checking
+        String result = cartService.formatTotal(inputPrice.getText(), inputQuantity.getText());
+        labelTotalAmount.setText(result);
 
-            // Use your Logic Layer
-            double total = cartService.calculateItemTotal(price, quantity);
-
-            labelTotalAmount.setText(String.format("%.2f", total));
-        } catch (NumberFormatException e) {
-            labelTotalAmount.setText("Invalid Input");
-        }*/
-        // Save to Database: Week3
-        try {
-            double price = Double.parseDouble(inputPrice.getText());
-            int quantity = Integer.parseInt(inputQuantity.getText());
-
-            double total = cartService.calculateItemTotal(price, quantity);
-            labelTotalAmount.setText(String.format("%.2f", total));
-
-            // 3. SAVE TO DB: This satisfies the persistence requirement
-            String currentLang = languageSelector.getValue();
-            dbService.saveTransaction(quantity, total, currentLang);
-
-        } catch (NumberFormatException e) {
-            labelTotalAmount.setText("Invalid Input");
+        // Only save to database if the result is a valid number
+        if (!result.equals("Invalid Input")) {
+            try {
+                double total = Double.parseDouble(result.replace(",", "."));
+                int quantity = Integer.parseInt(inputQuantity.getText());
+                String currentLang = languageSelector.getValue();
+                dbService.saveTransaction(quantity, total, currentLang);
+            } catch (Exception e) {
+                // This part is now minimal
+            }
         }
-
-
     }
 }

@@ -1,28 +1,47 @@
 package com.assignment.logic;
 
 import com.assignment.model.CartItem;
-
 import java.util.List;
+import java.util.Locale;
 
-/**
- * Service class for handling shopping cart calculations.
- * Satisfies Requirement #3: Isolated logic for unit testing.
- */
 public class CartService {
-    /**
-     * Calculates the total for a single item (Price * Quantity).
-     */
+
     public double calculateItemTotal(double price, int quantity) {
+        if (price < 0 || quantity < 0) return 0.0;
         return price * quantity;
     }
 
-    /**
-     * Calculates the grand total for a list of CartItems.
-     * This makes the project extendable for future database/multi-item tasks.
-     */
     public double calculateGrandTotal(List<CartItem> items) {
+        if (items == null) return 0.0;
         return items.stream()
                 .mapToDouble(CartItem::getTotalPrice)
                 .sum();
+    }
+
+    public String mapLanguageToCode(String selected) {
+        if (selected == null) return "en";
+        return switch (selected) {
+            case "Finnish" -> "fi";
+            case "Swedish" -> "sv";
+            case "Japanese" -> "ja";
+            case "Arabic" -> "ar";
+            default -> "en";
+        };
+    }
+
+    /**
+     * Handles string parsing and formatting.
+     * Moving this here allows 100% coverage on calculation logic.
+     */
+    public String formatTotal(String priceStr, String qtyStr) {
+        try {
+            double p = Double.parseDouble(priceStr);
+            int q = Integer.parseInt(qtyStr);
+            if (p < 0 || q < 0) return "0.00";
+            // Use Locale.US to force the dot separator
+            return String.format(Locale.US, "%.2f", calculateItemTotal(p, q));
+        } catch (NumberFormatException | NullPointerException e) {
+            return "Invalid Input";
+        }
     }
 }
