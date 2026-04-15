@@ -13,8 +13,6 @@ import java.util.Map;
 public class ShoppingCartController {
     @FXML private VBox rootContainer;
     @FXML private ComboBox<String> languageSelector;
-
-    // SonarQube Fix: Every FXML field on its own line
     @FXML private TextField inputPrice;
     @FXML private TextField inputQuantity;
     @FXML private Label labelPrice;
@@ -68,7 +66,7 @@ public class ShoppingCartController {
                 String currentLang = languageSelector.getValue();
                 dbService.saveTransaction(quantity, total, currentLang);
             } catch (Exception e) {
-                // This part is now minimal
+                java.util.logging.Logger.getLogger("Controller").log(java.util.logging.Level.WARNING, "Calculation failed", e);
             }
         }
     }

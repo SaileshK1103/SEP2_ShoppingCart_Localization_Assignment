@@ -11,8 +11,8 @@ public class DatabaseConnection {
 
   private static final String DB_HOST = System.getenv("DB_HOST");
   private static final String DB_NAME = System.getenv("DB_NAME");
-  private static final String DB_USER = System.getenv("DB_USERNAME");
-  private static final String DB_PASS = System.getenv("DB_PASSWORD");
+  private static final String DB_USER = System.getenv("DB_USER");
+  private static final String DB_PASSWORD = System.getenv("DB_PASSWORD");
 
   private DatabaseConnection() {
     throw new IllegalStateException("Utility class");
@@ -26,7 +26,7 @@ public class DatabaseConnection {
 
     try {
       LOGGER.info("🔍 Connecting to DB...");
-      Connection conn = DriverManager.getConnection(url, DB_USER, DB_PASS);
+      Connection conn = DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
       LOGGER.info("✅ Connection Successful!");
       return conn;
     } catch (SQLException e) {
