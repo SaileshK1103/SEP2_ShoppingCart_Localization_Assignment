@@ -38,6 +38,14 @@ pipeline {
                 }
             }
         }
+        stage('SonarQube Analysis') {
+            steps {
+
+                withSonarQubeEnv('SonarQubeServer') {
+                    sh 'mvn sonar:sonar -Dsonar.projectKey=shopping_cart_localization'
+                }
+            }
+        }
 
         stage('Build & Push Docker Image') {
             steps {

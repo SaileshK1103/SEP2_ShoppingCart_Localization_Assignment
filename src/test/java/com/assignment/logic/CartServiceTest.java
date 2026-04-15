@@ -46,18 +46,25 @@ class CartServiceTest {
 
     @Test
     void testFormatTotal() {
-        // Success path
         assertEquals("50.00", service.formatTotal("10.0", "5"));
-
-        // Negative input path (hits the if (p < 0 || q < 0) condition)
         assertEquals("0.00", service.formatTotal("-10", "5"));
         assertEquals("0.00", service.formatTotal("10", "-5"));
-
-        // Catch block: NumberFormatException path
         assertEquals("Invalid Input", service.formatTotal("abc", "5"));
-
-        // Catch block: NullPointerException path
         assertEquals("Invalid Input", service.formatTotal(null, "5"));
         assertEquals("Invalid Input", service.formatTotal("10", null));
+    }
+    @Test
+    void testTC_RELI_01_TransactionalSafety() {
+      assertDoesNotThrow(() -> {
+        service.formatTotal("10.0", "5");
+        service.formatTotal("invalid", null);
+      }, "System should handle transactions and parsing safely.");
+    }
+
+    @Test
+    void testTC_PERF_01_ResponseLatency() {
+      assertTimeout(java.time.Duration.ofMillis(200), () -> {
+        service.mapLanguageToCode("Japanese");
+      }, "TC-PERF-01 Failed: Response time exceeded 200ms.");
     }
 }
