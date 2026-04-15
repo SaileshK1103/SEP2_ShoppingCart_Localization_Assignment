@@ -1,6 +1,5 @@
 package com.assignment.data;
 
-import com.assignment.data.DatabaseConnection;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +23,7 @@ public class DatabaseService {
                 }
             }
         } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching labels for: " + langCode, e);
+            LOGGER.log(Level.SEVERE, e, () -> "Error fetching labels for: " + langCode);
         }
         return labels;
     }
