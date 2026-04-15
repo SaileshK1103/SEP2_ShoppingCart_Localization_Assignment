@@ -29,7 +29,7 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                sh 'mvn clean jacoco:prepare-agent test jacoco:report'
+                sh 'mvn clean jacoco:prepare-agent test jacoco:report -Djava.awt.headless=true'
             }
             post {
                 always {
@@ -40,9 +40,10 @@ pipeline {
         }
         stage('SonarQube Analysis') {
             steps {
-
                 withSonarQubeEnv('SonarQubeServer') {
-                    sh 'mvn sonar:sonar -Dsonar.projectKey=shopping_cart_localization'
+                    withCredentials([string(credentialsId: 'SONAR_TOKEN_ID', variable: 'SONAR_TOKEN')]) {
+                        sh "mvn sonar:sonar -Dsonar.projectKey=shopping_cart_localization -Dsonar.token=${SONAR_TOKEN}"
+                    }
                 }
             }
         }
