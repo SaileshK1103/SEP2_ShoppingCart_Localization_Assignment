@@ -29,7 +29,7 @@ ENV LC_ALL=C.UTF-8
 WORKDIR /app
 
 # Copy the JAR from the 'build' stage
-COPY --from=build /app/target/shopping_cart_localization-1.0-SNAPSHOT-shaded.jar app.jar
+COPY --from=build /app/target/shopping_cart.jar app.jar
 
 # Run the app
 CMD ["java", "-Dfile.encoding=UTF-8", "-Djava.awt.headless=false", "-jar", "app.jar"]
