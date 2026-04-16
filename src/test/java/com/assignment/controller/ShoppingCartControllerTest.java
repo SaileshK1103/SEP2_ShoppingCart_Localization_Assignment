@@ -16,7 +16,15 @@ class ShoppingCartControllerTest {
 
   @BeforeAll
   static void initJFX() {
-    try { Platform.startup(() -> {}); } catch (Exception ignored) {}
+    try {
+      Platform.startup(() -> {});
+    } catch (IllegalStateException e) {
+      // This exception is expected if the JavaFX Toolkit is already running.
+      // We ignore it so that multiple test classes can share the same toolkit instance.
+    } catch (Exception e) {
+      // Log other unexpected initialization errors without crashing the test suite
+      java.util.logging.Logger.getLogger("Test").log(java.util.logging.Level.SEVERE, "JFX Start Error", e);
+    }
   }
 
   @Test
@@ -24,23 +32,23 @@ class ShoppingCartControllerTest {
     ShoppingCartController controller = new ShoppingCartController();
     setupMocks(controller);
 
-    // 1. Setup Mock DatabaseService
+    // Setup Mock DatabaseService
     DatabaseService mockService = mock(DatabaseService.class);
     Map<String, String> fakeLabels = new HashMap<>();
     fakeLabels.put("msg.total", "Total:");
     when(mockService.getLabels(anyString())).thenReturn(fakeLabels);
 
-    // 2. Inject Mock into the PRIVATE FINAL field
+    // Inject Mock into the PRIVATE FINAL field
     Field serviceField = ShoppingCartController.class.getDeclaredField("dbService");
     serviceField.setAccessible(true);
     serviceField.set(controller, mockService);
 
-    // 3. Trigger initialize() - NO PARAMETERS as per your code
+    // Trigger initialize() - NO PARAMETERS as per your code
     Method initMethod = controller.getClass().getDeclaredMethod("initialize");
     initMethod.setAccessible(true);
     initMethod.invoke(controller);
 
-    // 4. Test Calculation logic
+    // Test Calculation logic
     setText(controller, "inputPrice", "10.0");
     setText(controller, "inputQuantity", "2");
 
@@ -48,7 +56,7 @@ class ShoppingCartControllerTest {
     calcMethod.setAccessible(true);
     calcMethod.invoke(controller);
 
-    // 5. Test Language Change branch (Arabic for RTL coverage)
+    // Test Language Change branch (Arabic for RTL coverage)
     Method langMethod = controller.getClass().getDeclaredMethod("updateLanguage", String.class);
     langMethod.setAccessible(true);
     langMethod.invoke(controller, "ar");
