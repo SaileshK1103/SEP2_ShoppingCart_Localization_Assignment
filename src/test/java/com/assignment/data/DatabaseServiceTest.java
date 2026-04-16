@@ -1,46 +1,52 @@
 package com.assignment.data;
 
 import org.junit.jupiter.api.Test;
-
+import org.mockito.MockedStatic;
+import java.sql.*;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class DatabaseServiceTest {
-    private final DatabaseService dbService = new DatabaseService();
+
+  private final DatabaseService dbService = new DatabaseService();
 
   @Test
-  void testGetLabels_Success() {
-    // Happy path: fetches labels for existing languages
-    Map<String, String> enLabels = dbService.getLabels("en");
-    Map<String, String> fiLabels = dbService.getLabels("fi");
+  void testGetLabels_Success() throws SQLException {
+    // Mock the JDBC objects
+    Connection mockConn = mock(Connection.class);
+    PreparedStatement mockPstmt = mock(PreparedStatement.class);
+    ResultSet mockRs = mock(ResultSet.class);
 
-    assertNotNull(enLabels, "Labels map should not be null");
-    assertNotNull(fiLabels, "Labels map should not be null");
+    // Define what happens when JDBC methods are called
+    when(mockConn.prepareStatement(anyString())).thenReturn(mockPstmt);
+    when(mockPstmt.executeQuery()).thenReturn(mockRs);
+    when(mockRs.next()).thenReturn(true, false); // Return one row, then end
+    when(mockRs.getString("msg_key")).thenReturn("msg.price");
+    when(mockRs.getString("msg_value")).thenReturn("Price:");
+
+    // Mock the static call to get the connection
+    try (MockedStatic<DatabaseConnection> mockedStatic = mockStatic(DatabaseConnection.class)) {
+      mockedStatic.when(DatabaseConnection::getConnection).thenReturn(mockConn);
+
+      Map<String, String> labels = dbService.getLabels("en");
+
+      assertEquals("Price:", labels.get("msg.price"));
+      verify(mockPstmt).setString(1, "en");
+    }
   }
 
   @Test
-  void testGetLabels_TriggersCatchBlock() {
-    // Logic path: Trigger SQLException/Error by passing invalid parameters
-    // This ensures the catch block in getLabels is covered
-    assertDoesNotThrow(() -> {
-      dbService.getLabels(null);
-    }, "Method should handle SQLException internally and not throw it");
-  }
+  void testCatchBlocks_FullCoverage() {
+    // Mock the static call to THROW an exception
+    try (MockedStatic<DatabaseConnection> mockedStatic = mockStatic(DatabaseConnection.class)) {
+      mockedStatic.when(DatabaseConnection::getConnection).thenThrow(new SQLException("Database Down"));
 
-  @Test
-  void testSaveTransaction_Success() {
-    assertDoesNotThrow(() -> {
-      dbService.saveTransaction(2, 25.50, "en");
-    }, "Standard transaction should save without error");
-  }
-
-  @Test
-  void testSaveTransaction_TriggersCatchBlock() {
-    // Logic path: Trigger SQLException/Error (e.g., passing null to a non-null column)
-    // This ensures the catch block in saveTransaction is covered
-    assertDoesNotThrow(() -> {
-      dbService.saveTransaction(-1, -1.0, null);
-    }, "Method should handle SQLException internally and not throw it");
+      // These calls will now hit the CATCH blocks in DatabaseService
+      // and we use assertDoesNotThrow to ensure the app doesn't crash.
+      assertDoesNotThrow(() -> dbService.getLabels("fi"));
+      assertDoesNotThrow(() -> dbService.saveTransaction(5, 50.0, "ar"));
+    }
   }
 }

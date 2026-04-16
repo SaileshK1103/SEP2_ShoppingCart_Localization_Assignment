@@ -21,17 +21,13 @@ public class DatabaseConnection {
   public static Connection getConnection() throws SQLException {
     String host = (DB_HOST != null) ? DB_HOST : "localhost";
     String name = (DB_NAME != null) ? DB_NAME : "shopping_cart_localization";
-
     String url = "jdbc:mysql://" + host + ":3307/" + name + "?useUnicode=true&characterEncoding=UTF-8";
 
     try {
       LOGGER.info("🔍 Connecting to DB...");
-      Connection conn = DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
-      LOGGER.info("✅ Connection Successful!");
-      return conn;
+      return DriverManager.getConnection(url, DB_USER, DB_PASSWORD);
     } catch (SQLException e) {
-      String errorMsg = "❌ Connection Failed to database: " + url;
-
+      String errorMsg = "Connection Failed to database: " + url;
       LOGGER.log(Level.SEVERE, errorMsg);
       throw new IllegalStateException(errorMsg, e);
     }
