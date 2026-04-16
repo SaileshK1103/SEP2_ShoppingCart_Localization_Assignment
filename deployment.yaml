@@ -18,7 +18,7 @@ spec:
           image: saileshk1103/sep2_shoppingcart_localization_assignment:latest
           env:
             - name: DB_URL
-              value: "jdbc:mysql://10.103.6.95:3306/shopping_cart_localization?connectTimeout=10000"
+              value: "jdbc:mysql://db-service:3306/shopping_cart_localization?connectTimeout=10000"
             - name: DB_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -30,7 +30,7 @@ spec:
                   name: db-credentials
                   key: password
             - name: DISPLAY
-              value: "192.168.0.103:0"
+              value: "host.docker.internal:0"
 ---
 apiVersion: apps/v1
 kind: Deployment
