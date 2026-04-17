@@ -16,6 +16,7 @@ spec:
       containers:
         - name: shopping-cart
           image: saileshk1103/sep2_shoppingcart_localization_assignment:latest
+          command: ["java", "-Djava.awt.headless=false", "-jar", "app.jar"]
           env:
             - name: DB_HOST
               value: "db-service"
