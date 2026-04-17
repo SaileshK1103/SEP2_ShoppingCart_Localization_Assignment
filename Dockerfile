@@ -10,6 +10,7 @@ FROM eclipse-temurin:21-jre
 
 # Install X11, GTK, AND Japanese Fonts
 RUN apt-get update && apt-get install -y \
+    xvfb \
     libx11-6 \
     libxext6 \
     libxrender1 \
@@ -32,4 +33,4 @@ WORKDIR /app
 COPY --from=build /app/target/shopping_cart.jar app.jar
 
 # Run the app
-CMD ["java", "-Dfile.encoding=UTF-8", "-Djava.awt.headless=false", "-jar", "app.jar"]
+CMD ["sh", "-c", "Xvfb :99 -screen 0 1024x768x16 & export DISPLAY=:99 && java -Dfile.encoding=UTF-8 -Djava.awt.headless=false -jar app.jar"]

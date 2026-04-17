@@ -17,13 +17,15 @@ spec:
         - name: shopping-cart
           image: saileshk1103/sep2_shoppingcart_localization_assignment:latest
           env:
-            - name: DB_URL
-              value: "jdbc:mysql://db-service:3307/shopping_cart_localization?connectTimeout=10000"
+            - name: DB_HOST
+              value: "db-service"
+            - name: DB_NAME
+              value: "shopping_cart_localization"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
                   name: db-credentials
-                  key: user
+                  key: username
             - name: DB_PASSWORD
               valueFrom:
                 secretKeyRef:
