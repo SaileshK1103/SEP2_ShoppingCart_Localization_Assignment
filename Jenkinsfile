@@ -9,16 +9,16 @@ pipeline {
     environment {
         PATH = "/usr/local/bin:${env.PATH}"
         // Global environment variables
-        DB_URL = "${params.DB_URL}"
-        DB_USERNAME = "${params.DB_USERNAME}"
+        DB_USER = "${params.DB_USER}"
         DB_PASSWORD = "${params.DB_PASSWORD}"
+        DB_NAME = 'shopping_cart_localization'
+        DB_HOST = "db-service"
+        DB_URL = "jdbc:mysql://${DB_HOST}:3307/${DB_NAME}"
         // Configuration for the build
         DOCKERHUB_CREDENTIALS_ID = 'Docker_Hub'
         DOCKERHUB_REPO = 'saileshk1103/sep2_shoppingcart_localization_assignment'
         DOCKER_IMAGE_TAG = 'latest'
-        // Helper for local tests
-        DB_HOST = 'localhost'
-        DB_NAME = 'shopping_cart_localization'
+
     }
 
     stages {
@@ -30,7 +30,8 @@ pipeline {
 
         stage('Test & Coverage') {
             steps {
-                sh 'mvn clean jacoco:prepare-agent test jacoco:report -Djava.awt.headless=true'
+                // This line is updated to use localhost specifically for the test phase
+                sh 'mvn clean jacoco:prepare-agent test jacoco:report -Djava.awt.headless=true -DDB_HOST=localhost -DDB_USER=${DB_USER} -DDB_PASSWORD=${DB_PASSWORD}'
             }
             post {
                 always {
